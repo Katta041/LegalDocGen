@@ -23,8 +23,12 @@ export const useAuthStore = create<AuthState>()(
       username: null,
 
       login: (username: string, password: string) => {
-        if (USERS[username] && USERS[username] === password) {
-          set({ isAuthenticated: true, username })
+        const userEntry = Object.entries(USERS).find(
+          ([key]) => key.toLowerCase() === username.toLowerCase()
+        )
+        
+        if (userEntry && userEntry[1] === password) {
+          set({ isAuthenticated: true, username: userEntry[0] }) // store original casing
           return true
         }
         return false
