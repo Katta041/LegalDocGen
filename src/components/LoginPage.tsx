@@ -90,11 +90,6 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-white/10">
-            <p className="text-xs text-slate-500 text-center">
-              Default credentials: <span className="text-slate-400">admin</span> / <span className="text-slate-400">admin123</span>
-            </p>
-          </div>
         </div>
       </div>
     </div>
