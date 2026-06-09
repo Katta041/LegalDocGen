@@ -25,7 +25,9 @@ export const templates: DocumentTemplate[] = [
       petitionerRelationName: "Sample petitionerRelationName 1",
       petitionerAge: 69,
       petitionerOccupation: "Housewife",
-      petitionerAddress: "Sample Address",
+      petitionerAddressTown: "Sample Address",
+      petitionerAddressDistrict: "Sample District",
+      petitionerAddressState: "Sample State",
       respondents: [
         {
           id: "r1",
@@ -35,7 +37,10 @@ export const templates: DocumentTemplate[] = [
           relationName: "Sample relationName 1",
           age: 67,
           occupation: "Agriculture",
-          address: "Sample Address"
+          addressVillage: "Sample Village",
+          addressMandal: "Sample Mandal",
+          addressDistrict: "Sample District",
+          addressState: "Sample State"
         },
         {
           id: "r2",
@@ -45,7 +50,11 @@ export const templates: DocumentTemplate[] = [
           relationName: "Sample relationName 2",
           age: 39,
           occupation: "Business",
-          address: "Sample Address"
+          addressTown: "Sample Address",
+          addressVillage: "Sample Village",
+          addressMandal: "Sample Mandal",
+          addressDistrict: "Sample District",
+          addressState: "Sample State"
         },
         {
           id: "r3",
@@ -55,7 +64,11 @@ export const templates: DocumentTemplate[] = [
           relationName: "Sample relationName 3",
           age: 35,
           occupation: "Housewife",
-          address: "Sample Address"
+          addressTown: "Sample Address",
+          addressVillage: "Sample Village",
+          addressMandal: "Sample Mandal",
+          addressDistrict: "Sample District",
+          addressState: "Sample State"
         },
         {
           id: "r4",
@@ -65,7 +78,11 @@ export const templates: DocumentTemplate[] = [
           relationName: "Sample relationName 4",
           age: 38,
           occupation: "Housewife",
-          address: "Sample Address"
+          addressTown: "Sample Address",
+          addressVillage: "Sample Village",
+          addressMandal: "Sample Mandal",
+          addressDistrict: "Sample District",
+          addressState: "Sample State"
         },
         {
           id: "r5",
@@ -75,7 +92,9 @@ export const templates: DocumentTemplate[] = [
           relationName: "Sample relationName 5",
           age: 39,
           occupation: "Housewife",
-          address: "Sample Address"
+          addressTown: "Sample Address",
+          addressDistrict: "Sample District",
+          addressState: "Sample State"
         }
       ],
       propertyType: "Agricultural",
@@ -186,7 +205,10 @@ export const templates: DocumentTemplate[] = [
       petitionerRelationName: "Sample petitionerRelationName 2",
       petitionerAge: 35,
       petitionerOccupation: "Housewife",
-      petitionerAddress: "Sample Address",
+      petitionerAddressTown: "Sample Address",
+      petitionerAddressVillage: "Sample Village",
+      petitionerAddressMandal: "Sample Mandal",
+      petitionerAddressDistrict: "Sample District",
       respondents: [
         {
           id: "r1",
@@ -196,7 +218,8 @@ export const templates: DocumentTemplate[] = [
           relationName: "Sample relationName 6",
           age: 42,
           occupation: "Housewife",
-          address: "Sample Address"
+          addressTown: "Sample Address",
+          addressDistrict: "Sample District"
         },
         {
           id: "r2",
@@ -206,7 +229,10 @@ export const templates: DocumentTemplate[] = [
           relationName: "Sample relationName 7",
           age: 35,
           occupation: "Private Employee",
-          address: "Sample Address"
+          addressTown: "Sample Address",
+          addressVillage: "Sample Village",
+          addressMandal: "Sample Mandal",
+          addressDistrict: "Sample District"
         },
         {
           id: "r3",
@@ -216,7 +242,10 @@ export const templates: DocumentTemplate[] = [
           relationName: "Sample relationName 8",
           age: 68,
           occupation: "Pensioner",
-          address: "Sample Address"
+          addressTown: "Sample Address",
+          addressVillage: "Sample Village",
+          addressMandal: "Sample Mandal",
+          addressDistrict: "Sample District"
         }
       ],
       propertyType: "Residential/Open Land",
@@ -280,7 +309,8 @@ export const templates: DocumentTemplate[] = [
         "Sample document.",
         "Sample document.",
         "Sample document."
-      ]
+      ],
+      factsOfTheCase: "Sample text."
     }
   }
 ]
