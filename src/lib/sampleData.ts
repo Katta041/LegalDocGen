@@ -25,7 +25,9 @@ export const templates: DocumentTemplate[] = [
       petitionerRelationName: "Sri K. Manoraju",
       petitionerAge: 69,
       petitionerOccupation: "Housewife",
-      petitionerAddress: "Flat No. 105, D-Block, Yelukuru Bunglows, Behind Radio Station, Kurnool City & District, Andhra Pradesh – 518004",
+      petitionerAddressTown: "Flat No. 105, D-Block, Yelukuru Bunglows, Behind Radio Station, Kurnool City",
+      petitionerAddressDistrict: "Kurnool",
+      petitionerAddressState: "Andhra Pradesh - 518004",
       respondents: [
         {
           id: "r1",
@@ -35,7 +37,10 @@ export const templates: DocumentTemplate[] = [
           relationName: "B. Balanna",
           age: 67,
           occupation: "Agriculture",
-          address: "H. No. 2-6, P. Rudravaram Village, Kurnool Mandal, Kurnool District – 518452"
+          addressVillage: "P. Rudravaram",
+          addressMandal: "Kurnool",
+          addressDistrict: "Kurnool",
+          addressState: "Andhra Pradesh - 518452"
         },
         {
           id: "r2",
@@ -45,7 +50,11 @@ export const templates: DocumentTemplate[] = [
           relationName: "Boya Lakshmanna",
           age: 39,
           occupation: "Business",
-          address: "H. No. 3-89B, P. Rudravaram Village, Kurnool Mandal, Kurnool District – 518452"
+          addressTown: "H. No. 3-89B",
+          addressVillage: "P. Rudravaram",
+          addressMandal: "Kurnool",
+          addressDistrict: "Kurnool",
+          addressState: "Andhra Pradesh - 518452"
         },
         {
           id: "r3",
@@ -55,7 +64,11 @@ export const templates: DocumentTemplate[] = [
           relationName: "B. Vikram",
           age: 35,
           occupation: "Housewife",
-          address: "H. No. 2-5, P. Rudravaram Village, Kurnool Mandal, Kurnool District – 518452"
+          addressTown: "H. No. 2-5",
+          addressVillage: "P. Rudravaram",
+          addressMandal: "Kurnool",
+          addressDistrict: "Kurnool",
+          addressState: "Andhra Pradesh - 518452"
         },
         {
           id: "r4",
@@ -65,7 +78,11 @@ export const templates: DocumentTemplate[] = [
           relationName: "Late B. Krishna",
           age: 38,
           occupation: "Housewife",
-          address: "H. No. 2-6, P. Rudravaram Village, Kurnool Mandal, Kurnool District – 518452"
+          addressTown: "H. No. 2-6",
+          addressVillage: "P. Rudravaram",
+          addressMandal: "Kurnool",
+          addressDistrict: "Kurnool",
+          addressState: "Andhra Pradesh - 518452"
         },
         {
           id: "r5",
@@ -75,7 +92,9 @@ export const templates: DocumentTemplate[] = [
           relationName: "Boya Krishna",
           age: 39,
           occupation: "Housewife",
-          address: "H. No. 70-121-6-1, Near Aditya School, Kallur, Kurnool City & District – 518003"
+          addressTown: "H. No. 70-121-6-1, Near Aditya School, Kallur, Kurnool City",
+          addressDistrict: "Kurnool",
+          addressState: "Andhra Pradesh - 518003"
         }
       ],
       propertyType: "Agricultural",
@@ -186,7 +205,10 @@ export const templates: DocumentTemplate[] = [
       petitionerRelationName: "Balappagari Chinna Ranganna",
       petitionerAge: 35,
       petitionerOccupation: "Housewife",
-      petitionerAddress: "Door No. 2-246, Main Bazar, Pyalakurthy Village, Kodumur Mandal, Kurnool District",
+      petitionerAddressTown: "Door No. 2-246, Main Bazar",
+      petitionerAddressVillage: "Pyalakurthy",
+      petitionerAddressMandal: "Kodumur",
+      petitionerAddressDistrict: "Kurnool",
       respondents: [
         {
           id: "r1",
@@ -196,7 +218,8 @@ export const templates: DocumentTemplate[] = [
           relationName: "Shaik Mohhamad Hussain",
           age: 42,
           occupation: "Housewife",
-          address: "Door No. 44/67-A, Roza Street, Kurnool City & District"
+          addressTown: "Door No. 44/67-A, Roza Street, Kurnool City",
+          addressDistrict: "Kurnool"
         },
         {
           id: "r2",
@@ -206,7 +229,10 @@ export const templates: DocumentTemplate[] = [
           relationName: "Shaik Balapeera",
           age: 35,
           occupation: "Private Employee",
-          address: "Door No. 1-235/7, Telugu Geri, Panchalingala Village, Kurnool Rural Mandal, Kurnool District"
+          addressTown: "Door No. 1-235/7, Telugu Geri",
+          addressVillage: "Panchalingala",
+          addressMandal: "Kurnool Rural",
+          addressDistrict: "Kurnool"
         },
         {
           id: "r3",
@@ -216,7 +242,10 @@ export const templates: DocumentTemplate[] = [
           relationName: "Shaik Sultan Saheb",
           age: 68,
           occupation: "Pensioner",
-          address: "Door No. 1-235/7, Telugu Geri, Panchalingala Village, Kurnool Rural Mandal, Kurnool District"
+          addressTown: "Door No. 1-235/7, Telugu Geri",
+          addressVillage: "Panchalingala",
+          addressMandal: "Kurnool Rural",
+          addressDistrict: "Kurnool"
         }
       ],
       propertyType: "Residential/Open Land",
@@ -280,7 +309,8 @@ export const templates: DocumentTemplate[] = [
         "Certified Copy of Registered Sale Deed No. 17746/2021 dated 28.12.2021 executed by Defendant No.2 in favour of Defendant No.1.",
         "Certified Copy of Registered Sale Deed No. 10609/2018 dated 29.09.2018 executed by Defendant No.3 in favour of Defendant No.2.",
         "Online Copy of Encumbrance Certificate relating to the Plaint Schedule Property."
-      ]
+      ],
+      factsOfTheCase: "It is submitted that the Plaintiff is the absolute owner and possessor of the Plaint Schedule Property..."
     }
   }
 ]

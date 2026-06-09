@@ -1,10 +1,11 @@
-import { Document, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, convertInchesToTwip, Packer } from "docx"
+import { Document, Paragraph, TextRun, AlignmentType, convertInchesToTwip, Packer } from "docx"
 import { saveAs } from "file-saver"
 import type { FormValues } from "./schema"
+import { formatAddress, formatPetitionerAddress } from "./utils"
 
 export function generateDOCXDocument(data: Partial<FormValues>): Document {
-  const isIA = !!data.iaNumber || data.petitionType?.toLowerCase().includes("interlocutory") || data.petitionType?.toLowerCase().includes("ia")
-  const respondentsList = data.respondents?.map((r, i) => `${i + 1}. ${r.salutation} ${r.name}, ${r.relationPrefix} ${r.relationName}, aged about ${r.age} years, ${r.occupation}, R/o ${r.address}`).join('\n') || ''
+  const isIA = data.petitionType?.toLowerCase().includes("interlocutory") || data.petitionType?.toLowerCase().includes("ia") || data.petitionType?.toLowerCase().includes("injunction") && !data.petitionType?.toLowerCase().includes("plaint")
+  const respondentsList = data.respondents?.map((r, i) => `${i + 1}. ${r.salutation} ${r.name}, ${r.relationPrefix} ${r.relationName}, aged about ${r.age} years, ${r.occupation}, R/o ${formatAddress(r)}`).join('\n') || ''
 
   if (isIA) {
     const buildCauseTitle = () => [
@@ -23,7 +24,7 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
       }),
       new Paragraph({
         alignment: AlignmentType.CENTER,
-        children: [new TextRun({ text: `O.S. No. ${data.osNumber || '___'} OF ${data.osYear || '___'}`, bold: true, size: 24, font: "Times New Roman" })],
+        children: [new TextRun({ text: `O.S. No. ${data.osNumber || '        '} OF ${data.osYear || '___'}`, bold: true, size: 24, font: "Times New Roman" })],
         spacing: { after: 200 }
       }),
       new Paragraph({
@@ -33,7 +34,7 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
       }),
       new Paragraph({
         alignment: AlignmentType.JUSTIFIED,
-        children: [new TextRun({ text: `${data.petitionerSalutation} ${data.petitionerName}, ${data.petitionerRelationPrefix} ${data.petitionerRelationName}, aged about ${data.petitionerAge} years, ${data.petitionerOccupation}, R/o ${data.petitionerAddress}`, size: 24, font: "Times New Roman" })],
+        children: [new TextRun({ text: `${data.petitionerSalutation} ${data.petitionerName}, ${data.petitionerRelationPrefix} ${data.petitionerRelationName}, aged about ${data.petitionerAge} years, ${data.petitionerOccupation}, R/o ${formatPetitionerAddress(data)}`, size: 24, font: "Times New Roman" })],
       }),
       new Paragraph({
         alignment: AlignmentType.RIGHT,
@@ -81,15 +82,13 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
             }),
             new Paragraph({
               alignment: AlignmentType.JUSTIFIED,
-              children: [new TextRun({ text: `I, ${data.petitionerName}, ${data.petitionerRelationPrefix} ${data.petitionerRelationName}, aged about ${data.petitionerAge} years, ${data.petitionerOccupation}, resident of ${data.petitionerAddress}, do hereby solemnly affirm and state on oath as follows:` })],
+              children: [new TextRun({ text: `I, ${data.petitionerName}, ${data.petitionerRelationPrefix} ${data.petitionerRelationName}, aged about ${data.petitionerAge} years, ${data.petitionerOccupation}, resident of ${formatPetitionerAddress(data)}, do hereby solemnly affirm and state on oath as follows:` })],
               spacing: { after: 200 }
             }),
             new Paragraph({
               alignment: AlignmentType.JUSTIFIED,
-              indent: { firstLine: convertInchesToTwip(0.5) },
               children: [
-                new TextRun({ text: "1.\t" }),
-                new TextRun({ text: `I am the petitioner/plaintiff herein and as such I am well acquainted with the facts of the case.` })
+                new TextRun({ text: data.factsOfTheCase || '1. I am the petitioner/plaintiff herein and as such I am well acquainted with the facts of the case.\n\n2. I filed the suit for declaration of my rights...' })
               ],
               spacing: { after: 200 }
             }),
@@ -156,7 +155,7 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: `O.S. NO. ${data.osNumber || '___'} OF ${data.osYear || '___'}`, bold: true, size: 24 })],
+            children: [new TextRun({ text: `O.S. NO. ${data.osNumber || '        '} OF ${data.osYear || '___'}`, bold: true, size: 24 })],
             spacing: { after: 200 }
           }),
           new Paragraph({
@@ -187,7 +186,7 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: 'PLAINT FILED ON BEHALF OF THE PLAINTIFF UNDER ORDER VII RULES 1 & 2 OF THE CODE OF CIVIL PROCEDURE', bold: true, underline: {} })],
+            children: [new TextRun({ text: data.petitionType?.toUpperCase() || 'PLAINT FILED ON BEHALF OF THE PLAINTIFF UNDER ORDER VII RULES 1 & 2 OF THE CODE OF CIVIL PROCEDURE', bold: true, underline: {} })],
             spacing: { after: 400 }
           }),
           new Paragraph({
@@ -195,7 +194,7 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
           }),
           new Paragraph({
             alignment: AlignmentType.JUSTIFIED,
-            children: [new TextRun({ text: `${data.petitionerSalutation} ${data.petitionerName}, ${data.petitionerRelationPrefix} ${data.petitionerRelationName}, Aged about: ${data.petitionerAge} years, Occ: ${data.petitionerOccupation}, R/o ${data.petitionerAddress}.` })],
+            children: [new TextRun({ text: `${data.petitionerSalutation} ${data.petitionerName}, ${data.petitionerRelationPrefix} ${data.petitionerRelationName}, Aged about: ${data.petitionerAge} years, Occ: ${data.petitionerOccupation}, R/o ${formatPetitionerAddress(data)}.` })],
             spacing: { after: 200 }
           }),
           new Paragraph({
@@ -211,7 +210,7 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
           }),
           new Paragraph({
             alignment: AlignmentType.JUSTIFIED,
-            children: [new TextRun({ text: 'It is submitted that the Plaintiff is the absolute owner and possessor of the Plaint Schedule Property. The Plaintiff acquired this property for valid sale consideration...' })],
+            children: [new TextRun({ text: data.factsOfTheCase || 'It is submitted that the Plaintiff is the absolute owner and possessor of the Plaint Schedule Property. The Plaintiff acquired this property for valid sale consideration...' })],
             spacing: { after: 600 }
           }),
           new Paragraph({

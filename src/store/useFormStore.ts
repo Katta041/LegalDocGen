@@ -2,6 +2,16 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import type { FormValues } from "@/lib/schema"
 
+export interface UIState {
+  activeSection: string | null
+  setActiveSection: (id: string | null) => void
+}
+
+export const useUIStore = create<UIState>((set) => ({
+  activeSection: null,
+  setActiveSection: (id) => set({ activeSection: id })
+}))
+
 export interface Draft {
   id: string
   name: string

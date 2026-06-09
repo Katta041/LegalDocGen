@@ -2,7 +2,7 @@ import pdfMake from "pdfmake/build/pdfmake"
 import pdfFonts from "pdfmake/build/vfs_fonts"
 import type { FormValues } from "./schema"
 import type { TDocumentDefinitions, Content, StyleDictionary } from "pdfmake/interfaces"
-import { buildAffidavitParagraphs } from "./affidavitParagraphs"
+import { formatAddress, formatPetitionerAddress } from "./utils"
 
 // Initialize VFS
 if (typeof (pdfFonts as any)?.pdfMake?.vfs !== 'undefined') {
@@ -33,7 +33,7 @@ function buildCauseTitleShort(data: Partial<FormValues>): Content[] {
     { text: data.courtName || '', style: 'courtName', margin: [0,0,0,10] },
     { text: `I.A. No. ${data.iaNumber||'___'} OF ${data.iaYear||'___'}`, style: 'heading' },
     { text: 'IN', style: 'heading' },
-    { text: `O.S. No. ${data.osNumber||'___'} OF ${data.osYear||'___'}`, style: 'heading', margin: [0,0,0,10] },
+    { text: `O.S. No. ${data.osNumber||'        '} OF ${data.osYear||'___'}`, style: 'heading', margin: [0,0,0,10] },
     { text: 'IN THE MATTER OF:', style: 'boldUnderlineLeft', margin: [0,0,0,10] },
     { text: `${data.petitionerSalutation||''} ${data.petitionerName||'___'}`, style: 'bodyText' },
     { text: '-- Petitioner/Plaintiff', style: 'rightAlign', margin: [0,0,0,5] },
@@ -44,16 +44,16 @@ function buildCauseTitleShort(data: Partial<FormValues>): Content[] {
 }
 
 function buildCauseTitleFull(data: Partial<FormValues>): Content[] {
-  const petLine = `${data.petitionerSalutation||''} ${data.petitionerName||'___'}, ${data.petitionerRelationPrefix||''} ${data.petitionerRelationName||''}, aged: ${data.petitionerAge||'___'} years, Occ: ${data.petitionerOccupation||'___'}, residing at ${data.petitionerAddress||'___'}.`
+  const petLine = `${data.petitionerSalutation||''} ${data.petitionerName||'___'}, ${data.petitionerRelationPrefix||''} ${data.petitionerRelationName||''}, aged: ${data.petitionerAge||'___'} years, Occ: ${data.petitionerOccupation||'___'}, residing at ${formatPetitionerAddress(data)}.`
   const resps: Content[] = (data.respondents||[]).map((r, i) => ({
-    text: `${i+1}. ${r.salutation||''} ${r.name||''}, ${r.relationPrefix||''} ${r.relationName||''}, Aged about: ${r.age||'___'} years, Occ: ${r.occupation||''}, R/o. ${r.address||''}`,
+    text: `${i+1}. ${r.salutation||''} ${r.name||''}, ${r.relationPrefix||''} ${r.relationName||''}, Aged about: ${r.age||'___'} years, Occ: ${r.occupation||''}, R/o. ${formatAddress(r)}`,
     style: 'bodyText', margin: [0,0,0,4] as [number,number,number,number],
   }))
   return [
     { text: data.courtName || '', style: 'courtName', margin: [0,0,0,10] },
     { text: `I.A. No. ${data.iaNumber||'___'} OF ${data.iaYear||'___'}`, style: 'heading' },
     { text: 'IN', style: 'heading' },
-    { text: `O.S. No. ${data.osNumber||'___'} OF ${data.osYear||'___'}`, style: 'heading', margin: [0,0,0,10] },
+    { text: `O.S. No. ${data.osNumber||'        '} OF ${data.osYear||'___'}`, style: 'heading', margin: [0,0,0,10] },
     { text: 'IN THE MATTER OF:', style: 'boldUnderlineLeft', margin: [0,0,0,10] },
     { text: petLine, style: 'bodyText' },
     { text: '-- Petitioner/Plaintiff', style: 'rightAlign', margin: [0,0,0,5] },
@@ -64,17 +64,17 @@ function buildCauseTitleFull(data: Partial<FormValues>): Content[] {
 }
 
 export function generatePDFDocument(data: Partial<FormValues>): TDocumentDefinitions {
-  const isIA = !!data.iaNumber || data.petitionType?.toLowerCase().includes("interlocutory") || data.petitionType?.toLowerCase().includes("ia")
+  const isIA = data.petitionType?.toLowerCase().includes("interlocutory") || data.petitionType?.toLowerCase().includes("ia") || data.petitionType?.toLowerCase().includes("injunction") && !data.petitionType?.toLowerCase().includes("plaint")
 
   if (isIA) {
-    const preamble = `I, ${data.petitionerSalutation||''} ${data.petitionerName||'___'}, ${data.petitionerRelationPrefix||''} ${data.petitionerRelationName||''}, aged: ${data.petitionerAge||'___'} years, residing at ${data.petitionerAddress||'___'} do hereby, solemnly affirm and state on oath as follows.`
+    const preamble = `I, ${data.petitionerSalutation||''} ${data.petitionerName||'___'}, ${data.petitionerRelationPrefix||''} ${data.petitionerRelationName||''}, aged: ${data.petitionerAge||'___'} years, residing at ${formatPetitionerAddress(data)} do hereby, solemnly affirm and state on oath as follows.`
 
     // AFFIDAVIT (Pages 1-6)
     const affidavit: Content[] = [
       ...buildCauseTitleShort(data),
       { text: 'AFFIDAVIT OF THE PETITIONER/PLAINTIFF', style: 'headingUnderline', margin: [0,0,0,15] },
       { text: preamble, style: 'bodyText', margin: [0,0,0,10] },
-      ...buildAffidavitParagraphs(data),
+      { text: data.factsOfTheCase || '1. I am the petitioner/plaintiff herein and as such I am well acquainted with the facts of the case.\n\n2. I filed the suit for declaration of my rights...', style: 'bodyText', margin: [0,0,0,10] },
       { text: 'DEPONENT', style: 'rightAlign', margin: [0,30,0,20], bold: true },
       { text: `Solemnly affirmed and signed before me on this the ${fmt(data.executionDate)} at ${data.executionPlace||'Kurnool'}.`, style: 'bodyText', margin: [0,0,0,20] },
       { text: `ADVOCATE, ${(data.executionPlace||'KURNOOL').toUpperCase()}`, style: 'rightAlign', bold: true },
@@ -110,7 +110,7 @@ export function generatePDFDocument(data: Partial<FormValues>): TDocumentDefinit
       { text: data.courtName || '', style: 'courtName', margin: [0,0,0,20] },
       { text: `I.A. No. ${data.iaNumber||'___'}/${data.iaYear||'___'}`, style: 'heading' },
       { text: 'IN', style: 'heading' },
-      { text: `O.S. No. ${data.osNumber||'___'} OF ${data.osYear||'___'}`, style: 'heading', margin: [0,0,0,30] },
+      { text: `O.S. No. ${data.osNumber||'        '} OF ${data.osYear||'___'}`, style: 'heading', margin: [0,0,0,30] },
       { text: 'PETITION FILED ON BEHALF OF THE PETITIONER/PLAINTIFF – UNDER ORDER XXXIX RULE 1 & 2 R/W SECTION 151 OF CPC', style: 'heading', margin: [0,0,0,120] },
       { text: 'ADDRESS FOR SERVICE', style: 'headingUnderline', margin: [0,0,0,10] },
       { text: (data.advocates||[]).map(a => `SRI ${a.name.toUpperCase()}, ${(a.qualifications||'').toUpperCase()},`).join('\n'), style: 'bodyText', alignment: 'center' },
@@ -128,13 +128,13 @@ export function generatePDFDocument(data: Partial<FormValues>): TDocumentDefinit
   } else {
     // MAIN PLAINT
     const resps: Content[] = (data.respondents||[]).map((r, i) => ({
-      text: `${i+1}. ${r.salutation||''} ${r.name||''}, ${r.relationPrefix||''} ${r.relationName||''}, Aged about: ${r.age||'___'} years, Occ: ${r.occupation||''}, R/o. ${r.address||''}`,
+      text: `${i+1}. ${r.salutation||''} ${r.name||''}, ${r.relationPrefix||''} ${r.relationName||''}, Aged about: ${r.age||'___'} years, Occ: ${r.occupation||''}, R/o. ${formatAddress(r)}`,
       style: 'bodyText', margin: [0,0,0,4] as [number,number,number,number],
     }))
 
     const content: Content[] = [
       { text: data.courtName || '', style: 'courtName', margin: [0,0,0,10] },
-      { text: `O.S. No. ${data.osNumber||'___'} OF ${data.osYear||'___'}`, style: 'heading', margin: [0,0,0,10] },
+      { text: `O.S. No. ${data.osNumber||'        '} OF ${data.osYear||'___'}`, style: 'heading', margin: [0,0,0,10] },
       { text: 'IN THE MATTER OF:', style: 'boldUnderlineLeft', margin: [0,0,0,10] },
       { text: `${data.petitionerSalutation||''} ${data.petitionerName||'___'}`, style: 'bodyText' },
       { text: '-- Plaintiff', style: 'rightAlign', margin: [0,0,0,5] },
@@ -142,16 +142,16 @@ export function generatePDFDocument(data: Partial<FormValues>): TDocumentDefinit
       { text: `${(data.respondents||[])[0]?.name||'___'} & Ors.,`, style: 'bodyText' },
       { text: '-- Defendants', style: 'rightAlign', margin: [0,0,0,20] },
       
-      { text: 'PLAINT FILED ON BEHALF OF THE PLAINTIFF UNDER ORDER VII RULES 1 & 2 OF THE CODE OF CIVIL PROCEDURE', style: 'headingUnderline', margin: [0,0,0,15] },
+      { text: data.petitionType?.toUpperCase() || 'PLAINT FILED ON BEHALF OF THE PLAINTIFF UNDER ORDER VII RULES 1 & 2 OF THE CODE OF CIVIL PROCEDURE', style: 'headingUnderline', margin: [0,0,0,15] },
       
       { text: 'Description of the Plaintiff:', style: 'boldUnderlineLeft', margin: [0,10,0,5] },
-      { text: `${data.petitionerSalutation||''} ${data.petitionerName||'___'}, ${data.petitionerRelationPrefix||''} ${data.petitionerRelationName||''}, Aged about: ${data.petitionerAge||'___'} years, Occ: ${data.petitionerOccupation||'___'}, R/o ${data.petitionerAddress||'___'}.`, style: 'bodyText', margin: [0,0,0,10] },
+      { text: `${data.petitionerSalutation||''} ${data.petitionerName||'___'}, ${data.petitionerRelationPrefix||''} ${data.petitionerRelationName||''}, Aged about: ${data.petitionerAge||'___'} years, Occ: ${data.petitionerOccupation||'___'}, R/o ${formatPetitionerAddress(data)}.`, style: 'bodyText', margin: [0,0,0,10] },
       
       { text: 'Description of the Defendants:', style: 'boldUnderlineLeft', margin: [0,10,0,5] },
       ...resps,
 
       { text: 'Facts of the case:', style: 'boldUnderlineLeft', margin: [0,10,0,5] },
-      { text: 'It is submitted that the Plaintiff is the absolute owner and possessor of the Plaint Schedule Property. The Plaintiff acquired this property for valid sale consideration...', style: 'bodyText', margin: [0,0,0,10] },
+      { text: data.factsOfTheCase || 'It is submitted that the Plaintiff is the absolute owner and possessor of the Plaint Schedule Property. The Plaintiff acquired this property for valid sale consideration...', style: 'bodyText', margin: [0,0,0,10] },
       
       { text: 'COUNSEL FOR PLAINTIFF', style: 'rightAlign', bold: true, margin: [0,50,0,0] },
       { text: 'PLAINTIFF', style: 'rightAlign', bold: true, margin: [0,5,0,0] },

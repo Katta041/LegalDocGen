@@ -12,7 +12,6 @@ import { FormSidebar } from '@/components/FormSidebar'
 import { PreviewPane } from '@/components/PreviewPane'
 import { LoginPage } from '@/components/LoginPage'
 import { templates } from '@/lib/sampleData'
-import type { DocumentTemplate } from '@/lib/sampleData'
 import { FileText, Download, LogOut, User } from 'lucide-react'
 import { TemplateSelector } from '@/components/TemplateSelector'
 

@@ -13,7 +13,7 @@ const USERS: Record<string, string> = {
   admin: "admin123",
   advocate: "legal@2025",
   clerk: "clerk@2025",
-  Mohan: "Mohan@321",
+  Mohan: "mohan@321",
 }
 
 export const useAuthStore = create<AuthState>()(

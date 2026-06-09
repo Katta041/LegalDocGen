@@ -1,4 +1,3 @@
-import React from 'react'
 import type { DocumentTemplate } from '@/lib/sampleData'
 
 interface TemplateSelectorProps {

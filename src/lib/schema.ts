@@ -8,7 +8,11 @@ export const respondentSchema = z.object({
   relationName: z.string().min(1, "Required"),
   age: z.number().or(z.string()).optional(),
   occupation: z.string().optional(),
-  address: z.string().min(1, "Address is required"),
+  addressVillage: z.string().optional(),
+  addressMandal: z.string().optional(),
+  addressTown: z.string().optional(),
+  addressDistrict: z.string().optional(),
+  addressState: z.string().optional(),
 })
 
 export const predecessorSchema = z.object({
@@ -53,7 +57,11 @@ export const formSchema = z.object({
   petitionerRelationName: z.string().min(1, "Required"),
   petitionerAge: z.number().or(z.string()).optional(),
   petitionerOccupation: z.string().optional(),
-  petitionerAddress: z.string().min(1, "Required"),
+  petitionerAddressVillage: z.string().optional(),
+  petitionerAddressMandal: z.string().optional(),
+  petitionerAddressTown: z.string().optional(),
+  petitionerAddressDistrict: z.string().optional(),
+  petitionerAddressState: z.string().optional(),
 
   // 3. Respondents
   respondents: z.array(respondentSchema).min(1, "At least one respondent is required"),
@@ -111,11 +119,12 @@ export const formSchema = z.object({
   partitionExtent: z.string().optional(),
   partitionBoundaryQuote: z.string().optional(),
 
-  // 8. Cause of Action
+  // 8. Cause of Action & Facts
   trespassDate: z.string().optional(),
   trespassExtent: z.string().optional(),
   incidentNarrative: z.string().optional(),
   threatsMade: z.string().optional(),
+  factsOfTheCase: z.string().optional(),
 
   // 9. Counsel
   advocates: z.array(advocateSchema).min(1, "At least one advocate is required"),
