@@ -57,7 +57,37 @@ export function PreviewPane({ data }: PreviewPaneProps) {
             Solemnly affirmed and signed before me on this the {data.executionDate ? new Date(data.executionDate).toLocaleDateString('en-GB').replace(/\//g, '.') : '___'} at {data.executionPlace || '___'}.
           </div>
           
-          <div className="text-right font-bold uppercase">ADVOCATE, {data.executionPlace?.toUpperCase() || '___'}</div>
+          <div className="text-right font-bold uppercase mb-12">ADVOCATE, {data.executionPlace?.toUpperCase() || '___'}</div>
+
+          {/* Add Plaint Schedule Property block */}
+          <div id="preview-section-4" className="mt-8 border-t border-slate-200 pt-8">
+            <div className="text-center font-bold underline mb-4 uppercase">SCHEDULE OF PROPERTY</div>
+            <div className="text-justify mb-4">
+              An {data.propertyType||'Agricultural'} Land situated in Survey No. {data.surveyNumber||'___'}, of {data.village||'___'} Village, {data.mandal||'___'} Mandal, {data.district||'___'} District, {data.state||'___'} State, to an extent of {data.propertyExtent||'___'} within the following boundaries:
+            </div>
+            <div className="ml-12 mb-4 space-y-2">
+              <div className="flex"><span className="w-24 font-bold">EAST</span><span>: {data.boundaryEast||'___'}</span></div>
+              <div className="flex"><span className="w-24 font-bold">WEST</span><span>: {data.boundaryWest||'___'}</span></div>
+              <div className="flex"><span className="w-24 font-bold">NORTH</span><span>: {data.boundaryNorth||'___'}</span></div>
+              <div className="flex"><span className="w-24 font-bold">SOUTH</span><span>: {data.boundarySouth||'___'}</span></div>
+            </div>
+            {data.easementRights && <div className="text-justify mb-4">With all easement rights.</div>}
+            <div className="text-right font-bold uppercase mt-8 mb-12">COUNSEL FOR PETITIONER/PLAINTIFF</div>
+          </div>
+
+          {/* Address for Service */}
+          <div id="preview-section-9" className="mt-8 border-t border-slate-200 pt-8">
+            <div className="text-center font-bold underline mb-4 uppercase">ADDRESS FOR SERVICE</div>
+            {data.advocates && data.advocates.length > 0 ? (
+              data.advocates.map((a, idx) => (
+                <div key={idx} className="text-center uppercase mb-1">SRI {a.name}, {a.qualifications},</div>
+              ))
+            ) : (
+              <div className="text-center uppercase mb-1">___</div>
+            )}
+            <div className="text-center uppercase mb-1">ADVOCATES, {data.executionPlace?.toUpperCase() || '___'}</div>
+            <div className="text-center uppercase">CELL: {data.counselPhone || '___'}</div>
+          </div>
         </div>
       </div>
     )
@@ -99,8 +129,28 @@ export function PreviewPane({ data }: PreviewPaneProps) {
           {data.factsOfTheCase || 'It is submitted that the Plaintiff is the absolute owner and possessor of the Plaint Schedule Property. The Plaintiff acquired this property for valid sale consideration...'}
         </div>
 
-        <div className="mt-12 text-right font-bold mb-8 uppercase">COUNSEL FOR PLAINTIFF</div>
-        <div className="text-right font-bold mb-12 uppercase">PLAINTIFF</div>
+        {/* Add Plaint Schedule Property block */}
+        <div id="preview-section-4" className="mt-8 pt-8">
+          <div className="text-center font-bold underline mb-4 uppercase">SCHEDULE OF PROPERTY</div>
+          <div className="text-justify mb-4">
+            An {data.propertyType||'Agricultural'} Land situated in Survey No. {data.surveyNumber||'___'}, of {data.village||'___'} Village, {data.mandal||'___'} Mandal, {data.district||'___'} District, {data.state||'___'} State, to an extent of {data.propertyExtent||'___'} within the following boundaries:
+          </div>
+          <div className="ml-12 mb-4 space-y-2">
+            <div className="flex"><span className="w-24 font-bold">EAST</span><span>: {data.boundaryEast||'___'}</span></div>
+            <div className="flex"><span className="w-24 font-bold">WEST</span><span>: {data.boundaryWest||'___'}</span></div>
+            <div className="flex"><span className="w-24 font-bold">NORTH</span><span>: {data.boundaryNorth||'___'}</span></div>
+            <div className="flex"><span className="w-24 font-bold">SOUTH</span><span>: {data.boundarySouth||'___'}</span></div>
+          </div>
+          {data.easementRights && <div className="text-justify mb-4">With all easement rights.</div>}
+        </div>
+
+        <div className="mt-12 flex justify-between">
+          <div className="w-1/2"></div>
+          <div className="w-1/2 text-right">
+            <div className="font-bold mb-12 uppercase">COUNSEL FOR PLAINTIFF</div>
+            <div className="font-bold mb-12 uppercase">PLAINTIFF</div>
+          </div>
+        </div>
 
         {data.verificationText && (
           <div id="preview-section-10" className="mt-8 border-t border-slate-200 pt-8">
@@ -125,6 +175,20 @@ export function PreviewPane({ data }: PreviewPaneProps) {
             <div className="text-right font-bold mt-12 uppercase">COUNSEL FOR PLAINTIFF</div>
           </div>
         )}
+
+        {/* Address for Service */}
+        <div id="preview-section-9" className="mt-8 border-t border-slate-200 pt-8">
+          <div className="text-center font-bold underline mb-4 uppercase">ADDRESS FOR SERVICE</div>
+          {data.advocates && data.advocates.length > 0 ? (
+            data.advocates.map((a, idx) => (
+              <div key={idx} className="text-center uppercase mb-1">SRI {a.name}, {a.qualifications},</div>
+            ))
+          ) : (
+            <div className="text-center uppercase mb-1">___</div>
+          )}
+          <div className="text-center uppercase mb-1">ADVOCATES, {data.executionPlace?.toUpperCase() || '___'}</div>
+          <div className="text-center uppercase">CELL: {data.counselPhone || '___'}</div>
+        </div>
       </div>
     </div>
   )
