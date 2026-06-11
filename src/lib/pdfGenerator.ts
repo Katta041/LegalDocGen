@@ -153,7 +153,20 @@ export function generatePDFDocument(data: Partial<FormValues>): TDocumentDefinit
       { text: 'Facts of the case:', style: 'boldUnderlineLeft', margin: [0,10,0,5] },
       { text: data.factsOfTheCase || 'It is submitted that the Plaintiff is the absolute owner and possessor of the Plaint Schedule Property. The Plaintiff acquired this property for valid sale consideration...', style: 'bodyText', margin: [0,0,0,10] },
       
-      { text: 'COUNSEL FOR PLAINTIFF', style: 'rightAlign', bold: true, margin: [0,50,0,0] },
+      { text: 'SCHEDULE OF PROPERTY', style: 'headingUnderline', margin: [0,30,0,15] },
+      { text: `An ${data.propertyType||'Agricultural'} Land situated in Survey No. ${data.surveyNumber||'___'}, of ${data.village||'___'} Village, ${data.mandal||'___'} Mandal, ${data.district||'___'} District, ${data.state||'___'} State, to an extent of ${data.propertyExtent||'___'} within the following boundaries.`, style: 'bodyText', margin: [0,0,0,10] },
+      {
+        table: { widths: [80, '*'], body: [
+          [{ text: 'EAST', bold: true, fontSize: 12 }, { text: `: ${data.boundaryEast||'___'}`, fontSize: 12 }],
+          [{ text: 'WEST', bold: true, fontSize: 12 }, { text: `: ${data.boundaryWest||'___'}`, fontSize: 12 }],
+          [{ text: 'NORTH', bold: true, fontSize: 12 }, { text: `: ${data.boundaryNorth||'___'}`, fontSize: 12 }],
+          [{ text: 'SOUTH', bold: true, fontSize: 12 }, { text: `: ${data.boundarySouth||'___'}`, fontSize: 12 }],
+        ]},
+        layout: 'noBorders', margin: [50,0,0,10] as [number,number,number,number]
+      },
+      ...(data.easementRights ? [{ text: 'With all easement rights.', style: 'bodyText', margin: [0,0,0,30] as [number,number,number,number] }] : []),
+
+      { text: 'COUNSEL FOR PLAINTIFF', style: 'rightAlign', bold: true, margin: [0,30,0,0] },
       { text: 'PLAINTIFF', style: 'rightAlign', bold: true, margin: [0,5,0,0] },
     ]
 
@@ -176,6 +189,17 @@ export function generatePDFDocument(data: Partial<FormValues>): TDocumentDefinit
       content.push(...list)
       content.push({ text: 'COUNSEL FOR PLAINTIFF', style: 'rightAlign', bold: true, margin: [0,30,0,0] })
     }
+
+    content.push({ text: 'ADDRESS FOR SERVICE', style: 'headingUnderline', margin: [0,40,0,10], pageBreak: 'before' })
+    if (data.advocates && data.advocates.length > 0) {
+      data.advocates.forEach(a => {
+        content.push({ text: `SRI ${a.name.toUpperCase()}, ${(a.qualifications||'').toUpperCase()},`, style: 'bodyText', alignment: 'center' })
+      })
+    } else {
+      content.push({ text: '___', style: 'bodyText', alignment: 'center' })
+    }
+    content.push({ text: `ADVOCATES, ${(data.executionPlace||'KURNOOL').toUpperCase()}`, style: 'bodyText', alignment: 'center' })
+    content.push({ text: `CELL: ${data.counselPhone||''}`, style: 'bodyText', alignment: 'center' })
 
     return {
       content,

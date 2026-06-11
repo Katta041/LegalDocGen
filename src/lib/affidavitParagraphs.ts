@@ -153,3 +153,16 @@ export function buildAffidavitParagraphs(data: Partial<FormValues>): Content[] {
 
   return paragraphs
 }
+
+export function generateFactsString(data: Partial<FormValues>): string {
+  const paras = buildAffidavitParagraphs(data)
+  return paras.map(p => {
+    const pAny = p as any;
+    if (pAny.columns && Array.isArray(pAny.columns)) {
+      return `${pAny.columns[0].text} ${pAny.columns[1].text}`
+    } else if (pAny.text) {
+      return pAny.text
+    }
+    return ''
+  }).join('\n\n')
+}

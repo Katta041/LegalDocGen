@@ -126,6 +126,52 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
               children: [new TextRun({ text: 'COUNSEL FOR PETITIONER/PLAINTIFF', bold: true })],
               spacing: { after: 400 }
             }),
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: 'SCHEDULE', bold: true, underline: {} })],
+              spacing: { after: 300 }
+            }),
+            new Paragraph({
+              alignment: AlignmentType.JUSTIFIED,
+              children: [new TextRun({ text: `An ${data.propertyType||'Agricultural'} Land situated in Survey No. ${data.surveyNumber||'___'}, of ${data.village||'___'} Village, ${data.mandal||'___'} Mandal, ${data.district||'___'} District, to an extent of ${data.propertyExtent||'___'} within the following boundaries:` })],
+              spacing: { after: 200 }
+            }),
+            new Paragraph({ children: [new TextRun({ text: `EAST\t: ${data.boundaryEast||'___'}` })], spacing: { after: 100 } }),
+            new Paragraph({ children: [new TextRun({ text: `WEST\t: ${data.boundaryWest||'___'}` })], spacing: { after: 100 } }),
+            new Paragraph({ children: [new TextRun({ text: `NORTH\t: ${data.boundaryNorth||'___'}` })], spacing: { after: 100 } }),
+            new Paragraph({ children: [new TextRun({ text: `SOUTH\t: ${data.boundarySouth||'___'}` })], spacing: { after: 200 } }),
+            ...(data.easementRights ? [new Paragraph({ children: [new TextRun({ text: 'With all easement rights.' })], spacing: { after: 300 } })] : []),
+            new Paragraph({
+              alignment: AlignmentType.RIGHT,
+              children: [new TextRun({ text: 'COUNSEL FOR PETITIONER/PLAINTIFF', bold: true })],
+            }),
+          ]
+        },
+        {
+          properties: {
+            page: { margin: { top: convertInchesToTwip(1), right: convertInchesToTwip(1), bottom: convertInchesToTwip(1), left: convertInchesToTwip(1) } }
+          },
+          children: [
+            new Paragraph({ text: "", pageBreakBefore: true }),
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: 'ADDRESS FOR SERVICE', bold: true, underline: {} })],
+              spacing: { after: 300 }
+            }),
+            ...(data.advocates && data.advocates.length > 0 ? data.advocates.map(a => new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: `SRI ${a.name.toUpperCase()}, ${(a.qualifications||'').toUpperCase()},` })],
+              spacing: { after: 100 }
+            })) : [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '___' })], spacing: { after: 100 } })]),
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: `ADVOCATES, ${(data.executionPlace||'KURNOOL').toUpperCase()}` })],
+              spacing: { after: 100 }
+            }),
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: `CELL: ${data.counselPhone||''}` })],
+            }),
           ]
         }
       ]
@@ -221,6 +267,25 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
             alignment: AlignmentType.RIGHT,
             children: [new TextRun({ text: 'PLAINTIFF', bold: true })],
           }),
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new TextRun({ text: 'SCHEDULE OF PROPERTY', bold: true, underline: {} })],
+            spacing: { before: 400, after: 300 }
+          }),
+          new Paragraph({
+            alignment: AlignmentType.JUSTIFIED,
+            children: [new TextRun({ text: `An ${data.propertyType||'Agricultural'} Land situated in Survey No. ${data.surveyNumber||'___'}, of ${data.village||'___'} Village, ${data.mandal||'___'} Mandal, ${data.district||'___'} District, ${data.state||'___'} State, to an extent of ${data.propertyExtent||'___'} within the following boundaries:` })],
+            spacing: { after: 200 }
+          }),
+          new Paragraph({ children: [new TextRun({ text: `EAST\t: ${data.boundaryEast||'___'}` })], spacing: { after: 100 } }),
+          new Paragraph({ children: [new TextRun({ text: `WEST\t: ${data.boundaryWest||'___'}` })], spacing: { after: 100 } }),
+          new Paragraph({ children: [new TextRun({ text: `NORTH\t: ${data.boundaryNorth||'___'}` })], spacing: { after: 100 } }),
+          new Paragraph({ children: [new TextRun({ text: `SOUTH\t: ${data.boundarySouth||'___'}` })], spacing: { after: 200 } }),
+          ...(data.easementRights ? [new Paragraph({ children: [new TextRun({ text: 'With all easement rights.' })], spacing: { after: 300 } })] : []),
+          new Paragraph({
+            alignment: AlignmentType.RIGHT,
+            children: [new TextRun({ text: 'COUNSEL FOR PLAINTIFF', bold: true })],
+          }),
           ...(data.verificationText ? [
             new Paragraph({ text: "", pageBreakBefore: true }),
             new Paragraph({
@@ -260,7 +325,27 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
               children: [new TextRun({ text: 'COUNSEL FOR PLAINTIFF', bold: true })],
               spacing: { before: 400 }
             })
-          ] : [])
+          ] : []),
+          new Paragraph({ text: "", pageBreakBefore: true }),
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new TextRun({ text: 'ADDRESS FOR SERVICE', bold: true, underline: {} })],
+            spacing: { after: 300 }
+          }),
+          ...(data.advocates && data.advocates.length > 0 ? data.advocates.map(a => new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new TextRun({ text: `SRI ${a.name.toUpperCase()}, ${(a.qualifications||'').toUpperCase()},` })],
+            spacing: { after: 100 }
+          })) : [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '___' })], spacing: { after: 100 } })]),
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new TextRun({ text: `ADVOCATES, ${(data.executionPlace||'KURNOOL').toUpperCase()}` })],
+            spacing: { after: 100 }
+          }),
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new TextRun({ text: `CELL: ${data.counselPhone||''}` })],
+          })
         ]
       }]
     })

@@ -5,11 +5,12 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Wand2 } from 'lucide-react'
 import { useUIStore } from '@/store/useFormStore'
+import { generateFactsString } from '@/lib/affidavitParagraphs'
 
 export function FormSidebar() {
-  const { register, control, setValue, watch } = useFormContext<FormValues>()
+  const { register, control, setValue, watch, getValues } = useFormContext<FormValues>()
   const listOfDocuments = watch('listOfDocuments')
   const setActiveSection = useUIStore(state => state.setActiveSection)
   
@@ -229,7 +230,15 @@ export function FormSidebar() {
             <Textarea className="h-24" {...register('incidentNarrative')} />
           </div>
           <div className="space-y-2 pt-4">
-            <Label className="font-semibold">Facts of the Case / Affidavit Details</Label>
+            <div className="flex items-center justify-between">
+              <Label className="font-semibold">Facts of the Case / Affidavit Details</Label>
+              <Button type="button" variant="outline" size="sm" onClick={() => {
+                const generated = generateFactsString(getValues())
+                setValue('factsOfTheCase', generated, { shouldValidate: true, shouldDirty: true })
+              }}>
+                <Wand2 className="w-4 h-4 mr-2" /> Generate from Fields
+              </Button>
+            </div>
             <Textarea className="h-40" {...register('factsOfTheCase')} placeholder="It is submitted that the Plaintiff is the absolute owner..." />
           </div>
         </CardContent>
