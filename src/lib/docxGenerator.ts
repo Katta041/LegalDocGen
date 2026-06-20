@@ -2,10 +2,18 @@ import { Document, Paragraph, TextRun, AlignmentType, convertInchesToTwip, Packe
 import { saveAs } from "file-saver"
 import type { FormValues } from "./schema"
 import { formatAddress, formatPetitionerAddress } from "./utils"
+import { generateFactsString } from "./affidavitParagraphs"
 
 export function generateDOCXDocument(data: Partial<FormValues>): Document {
   const isIA = data.petitionType?.toLowerCase().includes("interlocutory") || data.petitionType?.toLowerCase().includes("ia") || data.petitionType?.toLowerCase().includes("injunction") && !data.petitionType?.toLowerCase().includes("plaint")
   const respondentsList = data.respondents?.map((r, i) => `${i + 1}. ${r.salutation} ${r.name}, ${r.relationPrefix} ${r.relationName}, aged about ${r.age} years, ${r.occupation}, R/o ${formatAddress(r)}`).join('\n') || ''
+  
+  const autoFacts = generateFactsString(data)
+  const factsParas = autoFacts ? autoFacts.split('\n\n').map(p => new Paragraph({
+    alignment: AlignmentType.JUSTIFIED,
+    children: [new TextRun({ text: p })],
+    spacing: { after: 200 }
+  })) : []
 
   if (isIA) {
     const buildCauseTitle = () => [
@@ -88,10 +96,11 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
             new Paragraph({
               alignment: AlignmentType.JUSTIFIED,
               children: [
-                new TextRun({ text: data.factsOfTheCase || '1. I am the petitioner/plaintiff herein and as such I am well acquainted with the facts of the case.\n\n2. I filed the suit for declaration of my rights...' })
+                new TextRun({ text: data.factsOfTheCase || (factsParas.length ? '' : '1. I am the petitioner/plaintiff herein and as such I am well acquainted with the facts of the case...\n\n2. I filed the suit for declaration of my rights...') })
               ],
               spacing: { after: 200 }
             }),
+            ...factsParas,
             new Paragraph({
               alignment: AlignmentType.RIGHT,
               children: [new TextRun({ text: 'DEPONENT', bold: true })],
@@ -113,7 +122,7 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
             ...buildCauseTitle(),
             new Paragraph({
               alignment: AlignmentType.CENTER,
-              children: [new TextRun({ text: 'PETITION FILED ON BEHALF OF THE PETITIONER/PLAINTIFF – UNDER ORDER XXXIX RULE 1&2 R/W SECTION 151 OF CPC', bold: true, underline: {} })],
+              children: [new TextRun({ text: data.petitionType?.toUpperCase() || 'PETITION FILED ON BEHALF OF THE PETITIONER/PLAINTIFF – UNDER ORDER XXXIX RULE 1&2 R/W SECTION 151 OF CPC', bold: true, underline: {} })],
               spacing: { after: 300 }
             }),
             new Paragraph({
@@ -158,6 +167,11 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
               children: [new TextRun({ text: 'ADDRESS FOR SERVICE', bold: true, underline: {} })],
               spacing: { after: 300 }
             }),
+            ...(data.counselInitials ? [new Paragraph({
+              alignment: AlignmentType.LEFT,
+              children: [new TextRun({ text: `${data.counselInitials},`, bold: true })],
+              spacing: { after: 100 }
+            })] : []),
             ...(data.advocates && data.advocates.length > 0 ? data.advocates.map(a => new Paragraph({
               alignment: AlignmentType.CENTER,
               children: [new TextRun({ text: `SRI ${a.name.toUpperCase()}, ${(a.qualifications||'').toUpperCase()},` })],
@@ -165,7 +179,7 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
             })) : [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '___' })], spacing: { after: 100 } })]),
             new Paragraph({
               alignment: AlignmentType.CENTER,
-              children: [new TextRun({ text: `ADVOCATES, ${(data.executionPlace||'KURNOOL').toUpperCase()}` })],
+              children: [new TextRun({ text: `ADVOCATES, ${(data.counselAddress||'___').toUpperCase()}` })],
               spacing: { after: 100 }
             }),
             new Paragraph({
@@ -173,7 +187,51 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
               children: [new TextRun({ text: `CELL: ${data.counselPhone||''}` })],
             }),
           ]
-        }
+        },
+        ...(data.verificationText ? [{
+          children: [
+            new Paragraph({ text: "", pageBreakBefore: true }),
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: 'VERIFICATION', bold: true, underline: {} })],
+              spacing: { after: 300 }
+            }),
+            new Paragraph({
+              alignment: AlignmentType.JUSTIFIED,
+              children: [new TextRun({ text: data.verificationText })],
+              spacing: { after: 200 }
+            }),
+            new Paragraph({
+              alignment: AlignmentType.JUSTIFIED,
+              children: [new TextRun({ text: `Verified at ${data.executionPlace} on this the ${data.executionDate ? new Date(data.executionDate).toLocaleDateString('en-GB').split('/').join('.') : ''}.` })],
+              spacing: { after: 400 }
+            }),
+            new Paragraph({
+              alignment: AlignmentType.RIGHT,
+              children: [new TextRun({ text: 'DEPONENT', bold: true })],
+            })
+          ]
+        }] : []),
+        ...(data.listOfDocuments && data.listOfDocuments.length > 0 ? [{
+          children: [
+            new Paragraph({ text: "", pageBreakBefore: true }),
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: 'LIST OF DOCUMENTS', bold: true, underline: {} })],
+              spacing: { after: 300 }
+            }),
+            ...data.listOfDocuments.map((doc, i) => new Paragraph({
+              alignment: AlignmentType.JUSTIFIED,
+              children: [new TextRun({ text: `${i+1}.\t${doc}` })],
+              spacing: { after: 100 }
+            })),
+            new Paragraph({
+              alignment: AlignmentType.RIGHT,
+              children: [new TextRun({ text: 'COUNSEL FOR PETITIONER', bold: true })],
+              spacing: { before: 400 }
+            })
+          ]
+        }] : [])
       ]
     })
   } else {
@@ -256,9 +314,10 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
           }),
           new Paragraph({
             alignment: AlignmentType.JUSTIFIED,
-            children: [new TextRun({ text: data.factsOfTheCase || 'It is submitted that the Plaintiff is the absolute owner and possessor of the Plaint Schedule Property. The Plaintiff acquired this property for valid sale consideration...' })],
+            children: [new TextRun({ text: data.factsOfTheCase || (factsParas.length ? '' : 'It is submitted that the Plaintiff is the absolute owner and possessor of the Plaint Schedule Property. The Plaintiff acquired this property for valid sale consideration...') })],
             spacing: { after: 600 }
           }),
+          ...factsParas,
           new Paragraph({
             alignment: AlignmentType.RIGHT,
             children: [new TextRun({ text: 'COUNSEL FOR PLAINTIFF', bold: true })],
@@ -332,6 +391,11 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
             children: [new TextRun({ text: 'ADDRESS FOR SERVICE', bold: true, underline: {} })],
             spacing: { after: 300 }
           }),
+          ...(data.counselInitials ? [new Paragraph({
+            alignment: AlignmentType.LEFT,
+            children: [new TextRun({ text: `${data.counselInitials},`, bold: true })],
+            spacing: { after: 100 }
+          })] : []),
           ...(data.advocates && data.advocates.length > 0 ? data.advocates.map(a => new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [new TextRun({ text: `SRI ${a.name.toUpperCase()}, ${(a.qualifications||'').toUpperCase()},` })],
@@ -339,7 +403,7 @@ export function generateDOCXDocument(data: Partial<FormValues>): Document {
           })) : [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '___' })], spacing: { after: 100 } })]),
           new Paragraph({
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: `ADVOCATES, ${(data.executionPlace||'KURNOOL').toUpperCase()}` })],
+            children: [new TextRun({ text: `ADVOCATES, ${(data.counselAddress||'___').toUpperCase()}` })],
             spacing: { after: 100 }
           }),
           new Paragraph({

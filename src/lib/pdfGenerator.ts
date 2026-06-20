@@ -3,6 +3,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts"
 import type { FormValues } from "./schema"
 import type { TDocumentDefinitions, Content, StyleDictionary } from "pdfmake/interfaces"
 import { formatAddress, formatPetitionerAddress } from "./utils"
+import { buildAffidavitParagraphs } from "./affidavitParagraphs"
 
 // Initialize VFS
 if (typeof (pdfFonts as any)?.pdfMake?.vfs !== 'undefined') {
@@ -74,7 +75,8 @@ export function generatePDFDocument(data: Partial<FormValues>): TDocumentDefinit
       ...buildCauseTitleShort(data),
       { text: 'AFFIDAVIT OF THE PETITIONER/PLAINTIFF', style: 'headingUnderline', margin: [0,0,0,15] },
       { text: preamble, style: 'bodyText', margin: [0,0,0,10] },
-      { text: data.factsOfTheCase || '1. I am the petitioner/plaintiff herein and as such I am well acquainted with the facts of the case.\n\n2. I filed the suit for declaration of my rights...', style: 'bodyText', margin: [0,0,0,10] },
+      { text: data.factsOfTheCase || (!buildAffidavitParagraphs(data).length ? '1. I am the petitioner/plaintiff herein and as such I am well acquainted with the facts of the case...\n\n2. I filed the suit for declaration of my rights...' : ''), style: 'bodyText', margin: [0,0,0,10] },
+      ...buildAffidavitParagraphs(data),
       { text: 'DEPONENT', style: 'rightAlign', margin: [0,30,0,20], bold: true },
       { text: `Solemnly affirmed and signed before me on this the ${fmt(data.executionDate)} at ${data.executionPlace||'Kurnool'}.`, style: 'bodyText', margin: [0,0,0,20] },
       { text: `ADVOCATE, ${(data.executionPlace||'KURNOOL').toUpperCase()}`, style: 'rightAlign', bold: true },
@@ -84,7 +86,7 @@ export function generatePDFDocument(data: Partial<FormValues>): TDocumentDefinit
     const petition: Content[] = [
       { text: '', pageBreak: 'before' },
       ...buildCauseTitleFull(data),
-      { text: 'PETITION FILED ON BEHALF OF THE PETITIONER/PLAINTIFF – UNDER ORDER XXXIX RULE 1&2 R/W SECTION 151 OF CPC', style: 'headingUnderline', margin: [0,0,0,15] },
+      { text: data.petitionType?.toUpperCase() || 'PETITION FILED ON BEHALF OF THE PETITIONER/PLAINTIFF – UNDER ORDER XXXIX RULE 1&2 R/W SECTION 151 OF CPC', style: 'headingUnderline', margin: [0,0,0,15] },
       { text: `For the reasons stated in the accompanying affidavit, it is most respectfully prayed that this Hon'ble Court may be pleased to grant a temporary injunction restraining the Respondents/Defendants, their men, agents, servants, or any persons claiming under or through them from in any manner interfering with the Petitioner's/Plaintiff's peaceful possession and enjoyment of the Plaint Schedule Property, pending disposal of the suit, in the interest of justice; and pass such other and further orders as this Hon'ble Court may deem fit and proper in the circumstances of the case.`, style: 'bodyText', margin: [0,0,0,30] },
       { text: 'COUNSEL FOR PETITIONER/PLAINTIFF', style: 'rightAlign', bold: true, margin: [0,0,0,20] },
       { text: 'SCHEDULE', style: 'headingUnderline', margin: [0,0,0,15] },
@@ -111,15 +113,37 @@ export function generatePDFDocument(data: Partial<FormValues>): TDocumentDefinit
       { text: `I.A. No. ${data.iaNumber||'___'}/${data.iaYear||'___'}`, style: 'heading' },
       { text: 'IN', style: 'heading' },
       { text: `O.S. No. ${data.osNumber||'        '} OF ${data.osYear||'___'}`, style: 'heading', margin: [0,0,0,30] },
-      { text: 'PETITION FILED ON BEHALF OF THE PETITIONER/PLAINTIFF – UNDER ORDER XXXIX RULE 1 & 2 R/W SECTION 151 OF CPC', style: 'heading', margin: [0,0,0,120] },
+      { text: data.petitionType?.toUpperCase() || 'PETITION FILED ON BEHALF OF THE PETITIONER/PLAINTIFF – UNDER ORDER XXXIX RULE 1 & 2 R/W SECTION 151 OF CPC', style: 'heading', margin: [0,0,0,120] },
       { text: 'ADDRESS FOR SERVICE', style: 'headingUnderline', margin: [0,0,0,10] },
       { text: (data.advocates||[]).map(a => `SRI ${a.name.toUpperCase()}, ${(a.qualifications||'').toUpperCase()},`).join('\n'), style: 'bodyText', alignment: 'center' },
-      { text: `ADVOCATES, ${(data.executionPlace||'KURNOOL').toUpperCase()}`, style: 'bodyText', alignment: 'center' },
+      { text: `ADVOCATES, ${(data.counselAddress||'___').toUpperCase()}`, style: 'bodyText', alignment: 'center' },
       { text: `CELL: ${data.counselPhone||''}`, style: 'bodyText', alignment: 'center' },
     ]
 
+    const finalContent = [...affidavit, ...petition, ...cover]
+    
+    if (data.verificationText) {
+      finalContent.push({ text: 'VERIFICATION', style: 'headingUnderline', margin: [0,30,0,10], pageBreak: 'before' })
+      finalContent.push({ text: data.verificationText, style: 'bodyText', margin: [0,0,0,10] })
+      finalContent.push({ text: `Verified at ${data.executionPlace} on this the ${fmt(data.executionDate)}.`, style: 'bodyText', margin: [0,0,0,30] })
+      finalContent.push({ text: 'DEPONENT', style: 'rightAlign', bold: true })
+    }
+
+    if (data.listOfDocuments && data.listOfDocuments.length > 0) {
+      finalContent.push({ text: 'LIST OF DOCUMENTS', style: 'headingUnderline', margin: [0,30,0,10], pageBreak: 'before' })
+      const list = data.listOfDocuments.map((doc, i) => ({
+        columns: [
+          { text: `${i+1}.`, width: 20 },
+          { text: doc, width: '*' }
+        ],
+        margin: [0,0,0,8] as [number,number,number,number]
+      }))
+      finalContent.push(...list)
+      finalContent.push({ text: 'COUNSEL FOR PETITIONER', style: 'rightAlign', bold: true, margin: [0,30,0,0] })
+    }
+
     return {
-      content: [...affidavit, ...petition, ...cover],
+      content: finalContent,
       styles,
       defaultStyle: { font: 'Roboto', fontSize: 12, lineHeight: 1.5 },
       pageSize: 'A4',
@@ -151,7 +175,8 @@ export function generatePDFDocument(data: Partial<FormValues>): TDocumentDefinit
       ...resps,
 
       { text: 'Facts of the case:', style: 'boldUnderlineLeft', margin: [0,10,0,5] },
-      { text: data.factsOfTheCase || 'It is submitted that the Plaintiff is the absolute owner and possessor of the Plaint Schedule Property. The Plaintiff acquired this property for valid sale consideration...', style: 'bodyText', margin: [0,0,0,10] },
+      { text: data.factsOfTheCase || (!buildAffidavitParagraphs(data).length ? 'It is submitted that the Plaintiff is the absolute owner and possessor of the Plaint Schedule Property. The Plaintiff acquired this property for valid sale consideration...' : ''), style: 'bodyText', margin: [0,0,0,10] },
+      ...buildAffidavitParagraphs(data),
       
       { text: 'SCHEDULE OF PROPERTY', style: 'headingUnderline', margin: [0,30,0,15] },
       { text: `An ${data.propertyType||'Agricultural'} Land situated in Survey No. ${data.surveyNumber||'___'}, of ${data.village||'___'} Village, ${data.mandal||'___'} Mandal, ${data.district||'___'} District, ${data.state||'___'} State, to an extent of ${data.propertyExtent||'___'} within the following boundaries.`, style: 'bodyText', margin: [0,0,0,10] },
@@ -198,7 +223,7 @@ export function generatePDFDocument(data: Partial<FormValues>): TDocumentDefinit
     } else {
       content.push({ text: '___', style: 'bodyText', alignment: 'center' })
     }
-    content.push({ text: `ADVOCATES, ${(data.executionPlace||'KURNOOL').toUpperCase()}`, style: 'bodyText', alignment: 'center' })
+    content.push({ text: `ADVOCATES, ${(data.counselAddress||'___').toUpperCase()}`, style: 'bodyText', alignment: 'center' })
     content.push({ text: `CELL: ${data.counselPhone||''}`, style: 'bodyText', alignment: 'center' })
 
     return {
