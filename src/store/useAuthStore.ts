@@ -8,11 +8,13 @@ interface AuthState {
   logout: () => void
 }
 
-// Simple hardcoded credentials for client-side auth
+// Demo gate, not security. This app has no backend, so any check here runs in
+// the browser and can be bypassed. A single demo account is read from Vite env
+// vars at build time (see .env.example) and defaults to demo / demo.
+const DEMO_USERNAME = (import.meta.env.VITE_DEMO_USERNAME as string | undefined) || "demo"
+const DEMO_PASSWORD = (import.meta.env.VITE_DEMO_PASSWORD as string | undefined) || "demo"
 const USERS: Record<string, string> = {
-  admin: "demo",
-  advocate: "demo",
-  clerk: "demo",
+  [DEMO_USERNAME]: DEMO_PASSWORD,
 }
 
 export const useAuthStore = create<AuthState>()(
